@@ -1,12 +1,21 @@
 import { Link, Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
 import useUserAuth from "../hooks/useUserAuth ";
+import { DropDownButton, Roles } from "../types";
+import DropdownBtn from "./UI/DropdownBtn";
 
 const Layout = () => {
-  const { logoutUser } = useUserAuth({enableLocalStorage: true});
+  const { logoutUser, user } = useUserAuth({ enableLocalStorage: true });
 
-  const handleLogout = () => {
-    logoutUser();
-  };
+  const dropDownButtons: DropDownButton[] = [
+    { to: "/profile", label: "My profile" },
+    { label: "Logout", onClick: logoutUser },
+  ];
+
+  if (user?.role === Roles.admin) {
+    dropDownButtons.unshift({ to: "/admin", label: "Admin panel" });
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -16,14 +25,18 @@ const Layout = () => {
             <img className="w-10 h-10" src="/lawyer-logo.svg" alt="" />
           </Link>
 
-          <ul className="flex space-x-4">
+          <ul className="flex space-x-4 text-sm font-medium text-main-light">
             <li className="flex items-center">
-              <Link to="/">Home</Link>
+              <button>
+                <Link to="/">Home</Link>
+              </button>
             </li>
 
-            <li>
-              <button onClick={handleLogout}>Log out</button>
-            </li>
+            <DropdownBtn
+              buttonName="Profile"
+              dropDownButtons={dropDownButtons}
+              needArrowDown={false}
+            />
           </ul>
         </nav>
       </header>
@@ -35,6 +48,15 @@ const Layout = () => {
       <footer className="bg-minor-dark  text-center py-4">
         &copy; 2023 Lawyer App. All rights reserved.
       </footer>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        closeOnClick
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </div>
   );
 };

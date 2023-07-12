@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import LoadingSpinner from "./LoadingSpinner";
-import useUserAuth from "../hooks/useUserAuth ";
+import LoadingSpinner from "../UI/LoadingSpinner";
+import useUserAuth from "../../hooks/useUserAuth ";
 
 interface Props {
   children: ReactNode;

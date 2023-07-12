@@ -1,7 +1,18 @@
 import { useState } from "react";
+
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
+
 import useUserAuth from "./useUserAuth ";
+import { Roles, User } from "../types";
+
+const USER: User = {
+  id: "123",
+  name: "John Doe",
+  email: "john@example.com",
+  role: Roles["admin"],
+  jwt: "this_is_jwt",
+};
 
 interface LoginData {
   email: string;
@@ -9,6 +20,7 @@ interface LoginData {
 }
 
 const useLogin = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const { loginUser } = useUserAuth({ enableLocalStorage: true });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -16,14 +28,16 @@ const useLogin = () => {
   const handleLogin = async (data: LoginData) => {
     const { email, password } = data;
 
+    setErrors({}); // Clear errors before validating the form inputs
+    
     const errors: { [key: string]: string } = {};
 
     if (!email) {
-      errors["email"] = "Email is required";
+      errors["email"] = "Enter an email or username";
     }
 
     if (!password) {
-      errors["password"] = "Password is required";
+      errors["password"] = "Enter a password";
     } else if (password.length < 6) {
       errors["password"] = "Password must contain more than 6 characters";
     }
@@ -33,13 +47,7 @@ const useLogin = () => {
       return;
     }
 
-    const USER = {
-      id: "123",
-      name: "John Doe",
-      email: "john@example.com",
-      role: "operator",
-      jwt: "this_is_jwt",
-    };
+    setIsLoading(true);
 
     // Create a new instance of axios mock adapter
     const mock = new MockAdapter(axios);
@@ -59,12 +67,17 @@ const useLogin = () => {
       // Handle the response
       const { user } = response.data;
 
-      loginUser(user); // Pass only the user object
+      setTimeout(async () => {
+        loginUser(user); // Pass only the user object
+        setIsLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Login error:", error);
       // Handle login error
       // Example: Display error message
-      setErrors({ login: "An error occurred during login. Please try again later." });
+      setErrors({
+        login: "An error occurred during login. Please try again later.",
+      });
     }
 
     // Clear the axios mock adapter
@@ -74,6 +87,7 @@ const useLogin = () => {
   return {
     errors,
     handleLogin,
+    isLoading,
   };
 };
 
