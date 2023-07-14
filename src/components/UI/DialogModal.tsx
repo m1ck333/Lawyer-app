@@ -6,6 +6,7 @@ type Props = {
   buttonName: string | null;
   title: string;
   isOpenDialog?: boolean;
+  onClose?: () => void;
 };
 
 const DialogModal = ({
@@ -13,6 +14,7 @@ const DialogModal = ({
   buttonName,
   title,
   isOpenDialog = false,
+  onClose,
 }: Props) => {
   const [isOpen, setIsOpen] = useState(isOpenDialog);
 
@@ -21,6 +23,10 @@ const DialogModal = ({
   }, [isOpenDialog]);
 
   function closeModal() {
+    if(onClose) {
+      onClose()
+    }
+    
     setIsOpen(false);
   }
 

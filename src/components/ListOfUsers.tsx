@@ -4,9 +4,10 @@ import {
   CheckIcon,
   TrashIcon,
 } from "@heroicons/react/20/solid";
+
 import useUserList from "../hooks/useUserList";
+import { Roles, User } from "../types";
 import Spinner from "./UI/Spinner";
-import { Roles } from "../types";
 import DialogModal from "./UI/DialogModal";
 
 const ListOfUsers = () => {
@@ -20,6 +21,7 @@ const ListOfUsers = () => {
     cancelDeleteUser,
     executeDeleteUser,
     deleteUserId,
+    setDeleteUserId,
     isLoading,
   } = useUserList();
 
@@ -44,7 +46,7 @@ const ListOfUsers = () => {
         </thead>
 
         <tbody>
-          {users.map((user) => (
+          {users.map((user: User) => (
             <tr key={user.id}>
               <td className="p-2">{user.id}</td>
 
@@ -146,7 +148,11 @@ const ListOfUsers = () => {
                   onClick={() => handleSaveChanges(user.id)}
                   disabled={isLoading}
                 >
-                  {isLoading ? <Spinner /> : <CheckIcon className="h-6 w-6" />}
+                  {isLoading ? (
+                    <Spinner classes="h-6 w-6" />
+                  ) : (
+                    <CheckIcon className="h-6 w-6" />
+                  )}
                 </button>
               </td>
 
@@ -156,7 +162,11 @@ const ListOfUsers = () => {
                   onClick={() => confirmDeleteUser(user.id)}
                   disabled={isLoading}
                 >
-                  {isLoading ? <Spinner /> : <TrashIcon className="h-6 w-6" />}
+                  {isLoading ? (
+                    <Spinner classes="h-6 w-6" />
+                  ) : (
+                    <TrashIcon className="h-6 w-6" />
+                  )}
                 </button>
               </td>
             </tr>
@@ -169,8 +179,10 @@ const ListOfUsers = () => {
         title="Delete User"
         buttonName=""
         isOpenDialog={deleteUserId !== undefined}
+        onClose={() => setDeleteUserId(undefined)}
       >
         <p>Are you sure you want to delete this user?</p>
+
         <div className="flex justify-end mt-4">
           <button
             className="px-4 py-2 mr-2 text-sm !text-white !bg-red-500 rounded hover:!bg-red-700"
@@ -179,6 +191,7 @@ const ListOfUsers = () => {
           >
             {isLoading ? <Spinner /> : "Yes"}
           </button>
+
           <button
             className="px-4 py-2 text-sm !text-gray-600 !bg-gray-200 rounded hover:!bg-gray-300"
             onClick={cancelDeleteUser}

@@ -1,8 +1,8 @@
 import { FormInput } from "../../types";
-import LoadingSpinner from "./LoadingSpinner";
 import LoadingSpinnerBtn from "./LoadingSpinnerBtn";
 
 type Props = {
+  classes?: string;
   formInputs: FormInput[];
   onSubmitHandler: (event: React.FormEvent) => void;
   submitButtonName: string;
@@ -10,6 +10,7 @@ type Props = {
 };
 
 const Form = ({
+  classes,
   formInputs,
   onSubmitHandler,
   submitButtonName,
@@ -17,7 +18,7 @@ const Form = ({
 }: Props) => {
   return (
     <form
-      className="bg-main-light text-main-dark shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xl"
+      className={`bg-main-light text-main-dark shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xl ${classes}`}
       onSubmit={onSubmitHandler}
     >
       {formInputs.map((input) => (

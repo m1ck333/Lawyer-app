@@ -4,11 +4,11 @@ type Props = {
 
 const Spinner = ({ classes }: Props) => {
   return (
-    <span className={` ${classes}`}>
+    <span>
       <svg
         aria-hidden="true"
         role="status"
-        className="inline w-4 h-4  text-main-light animate-spin"
+        className={`inline w-4 h-4  text-main-light animate-spin ${classes}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

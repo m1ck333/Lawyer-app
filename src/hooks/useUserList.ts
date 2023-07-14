@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { toast } from "react-toastify";
-import axios from "axios";
-
-import { User, Roles } from "../types";
 import {
   fetchUsers as fetchUsersAction,
   updateUser,
   deleteUser,
+  setIsLoading,
 } from "../redux/slices/userSlice";
+import { toast } from "react-toastify";
+import axios from "axios";
+
+import { User, Roles } from "../types";
 
 const useUserList = () => {
   const isLoading = useAppSelector((state) => state.user.isLoading);
@@ -27,16 +28,38 @@ const useUserList = () => {
     setDeleteUserId(undefined);
   };
 
-  const executeDeleteUser = (userId: number | undefined) => {
+  const executeDeleteUser = async (userId: number | undefined) => {
     // Delete the user if the user confirms the deletion
     if (deleteUserId === userId) {
-      handleDeleteUser(userId);
-      setDeleteUserId(undefined);
+      try {
+        dispatch(setIsLoading(true)); // Set isLoading to true
+
+        const apiUrl = import.meta.env.VITE_API_URL;
+        await axios.delete<User>(`${apiUrl}/api/delete/${userId}/user`);
+
+        // Dispatch the deleteUser action with the userId payload
+        dispatch(deleteUser(<number>userId));
+
+        toast("Successfully deleted user.", {
+          type: "success",
+        });
+      } catch (error) {
+        console.log("Error deleting user:", error);
+
+        toast("Unsuccessfully deleted user.", {
+          type: "error",
+        });
+      } finally {
+        dispatch(setIsLoading(false)); // Set isLoading to false
+        setDeleteUserId(undefined);
+      }
     }
   };
 
   const fetchUsersFromAPI = async () => {
     try {
+      dispatch(setIsLoading(true)); // Set isLoading to true
+
       const apiUrl = import.meta.env.VITE_API_URL;
       const response = await axios.get<User[]>(`${apiUrl}/api/user`);
       dispatch(fetchUsersAction(response.data));
@@ -45,6 +68,8 @@ const useUserList = () => {
       toast("Unsuccessfully fetched users.", {
         type: "error",
       });
+    } finally {
+      dispatch(setIsLoading(false)); // Set isLoading to false
     }
   };
 
@@ -70,7 +95,7 @@ const useUserList = () => {
   const handleSaveChanges = async (userId: number | undefined) => {
     if (userId !== undefined) {
       const userToUpdate = users.find((user) => user.id === userId);
-  
+
       if (userToUpdate) {
         const {
           id,
@@ -82,7 +107,7 @@ const useUserList = () => {
           email,
           selectedRole,
         } = userToUpdate;
-  
+
         const updatedUser = {
           id,
           username,
@@ -92,23 +117,27 @@ const useUserList = () => {
           isActive,
           email,
         };
-  
+
         try {
+          dispatch(setIsLoading(true)); // Set isLoading to true
+
           const apiUrl = import.meta.env.VITE_API_URL;
           await axios.put<User>(`${apiUrl}/api/user`, updatedUser);
-  
+
           // Dispatch the updateUser action with the updatedUser payload
           dispatch(updateUser({ userId, updatedUser }));
-  
+
           toast("Successfully saved changes.", {
             type: "success",
           });
         } catch (error) {
           console.log("Error saving changes:", error);
-  
+
           toast("Unsuccessfully saved changes.", {
             type: "error",
           });
+        } finally {
+          dispatch(setIsLoading(false)); // Set isLoading to false
         }
       }
     }
@@ -136,41 +165,19 @@ const useUserList = () => {
     dispatch(fetchUsersAction(updatedUsers));
   };
 
-  const handleDeleteUser = async (userId: number | undefined) => {
-    if (userId !== undefined) {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL;
-        await axios.delete<User>(`${apiUrl}/api/delete/${userId}/user`);
-
-        // Dispatch the deleteUser action with the userId payload
-        dispatch(deleteUser(userId));
-
-        toast("Successfully deleted user.", {
-          type: "success",
-        });
-      } catch (error) {
-        console.log("Error deleting user:", error);
-
-        toast("Unsuccessfully deleted user.", {
-          type: "error",
-        });
-      }
-    }
-  };
-
   return {
     users,
     handleInputChange,
     handleSaveChanges,
     handleToggleBlock,
     handleRoleSelection,
-    handleDeleteUser,
+    executeDeleteUser,
     isLoading,
     fetchUsers: fetchUsersFromAPI,
     confirmDeleteUser,
     cancelDeleteUser,
-    executeDeleteUser,
     deleteUserId,
+    setDeleteUserId,
   };
 };
 
