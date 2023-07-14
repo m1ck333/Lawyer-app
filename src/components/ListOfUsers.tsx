@@ -1,8 +1,13 @@
 import { Menu, Switch } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import {
+  ChevronDownIcon,
+  CheckIcon,
+  TrashIcon,
+} from "@heroicons/react/20/solid";
 import useUserList from "../hooks/useUserList";
 import Spinner from "./UI/Spinner";
 import { Roles } from "../types";
+import DialogModal from "./UI/DialogModal";
 
 const ListOfUsers = () => {
   const {
@@ -11,6 +16,10 @@ const ListOfUsers = () => {
     handleSaveChanges,
     handleToggleBlock,
     handleRoleSelection,
+    confirmDeleteUser,
+    cancelDeleteUser,
+    executeDeleteUser,
+    deleteUserId,
     isLoading,
   } = useUserList();
 
@@ -28,7 +37,9 @@ const ListOfUsers = () => {
             <th className="p-2">Email</th>
             <th className="p-2">Role</th>
             <th className="p-2">Active</th>
-            <th className="p-2">Actions</th>
+            <th className="p-2" colSpan={3}>
+              Actions
+            </th>
           </tr>
         </thead>
 
@@ -113,10 +124,11 @@ const ListOfUsers = () => {
 
               <td className="p-2">
                 <Switch
+                  className="p-1 h-8 w-12"
                   checked={!user.isActive}
                   onChange={() => handleToggleBlock(user.id)}
                 >
-                  <span className="bg-main-light rounded shadow p-1 h-6 w-10 flex">
+                  <span className="bg-main-light rounded shadow p-1 h-full w-full flex">
                     <span
                       className={`block h-full w-1/2 rounded transition duration-300 ease-in-out transform ${
                         !user.isActive
@@ -130,17 +142,52 @@ const ListOfUsers = () => {
 
               <td className="p-2">
                 <button
-                  className="w-24"
+                  className="!bg-green-500 hover:!bg-green-700 h-8 flex justify-center items-center"
                   onClick={() => handleSaveChanges(user.id)}
                   disabled={isLoading}
                 >
-                  {isLoading ? <Spinner /> : "Update"}
+                  {isLoading ? <Spinner /> : <CheckIcon className="h-6 w-6" />}
+                </button>
+              </td>
+
+              <td className="p-2">
+                <button
+                  className="!bg-red-500 hover:!bg-red-700 h-8 flex justify-center items-center"
+                  onClick={() => confirmDeleteUser(user.id)}
+                  disabled={isLoading}
+                >
+                  {isLoading ? <Spinner /> : <TrashIcon className="h-6 w-6" />}
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Delete User Confirmation Dialog */}
+      <DialogModal
+        title="Delete User"
+        buttonName=""
+        isOpenDialog={deleteUserId !== undefined}
+      >
+        <p>Are you sure you want to delete this user?</p>
+        <div className="flex justify-end mt-4">
+          <button
+            className="px-4 py-2 mr-2 text-sm !text-white !bg-red-500 rounded hover:!bg-red-700"
+            onClick={() => executeDeleteUser(deleteUserId)}
+            disabled={isLoading}
+          >
+            {isLoading ? <Spinner /> : "Yes"}
+          </button>
+          <button
+            className="px-4 py-2 text-sm !text-gray-600 !bg-gray-200 rounded hover:!bg-gray-300"
+            onClick={cancelDeleteUser}
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
+        </div>
+      </DialogModal>
     </div>
   );
 };

@@ -1,14 +1,24 @@
-import { Fragment, useState, ReactNode } from "react";
+import { Fragment, useState, ReactNode, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 type Props = {
   children: ReactNode;
   buttonName: string | null;
   title: string;
+  isOpenDialog?: boolean;
 };
 
-const DialogModal = ({ children, buttonName, title }: Props) => {
-  let [isOpen, setIsOpen] = useState(false);
+const DialogModal = ({
+  children,
+  buttonName,
+  title,
+  isOpenDialog = false,
+}: Props) => {
+  const [isOpen, setIsOpen] = useState(isOpenDialog);
+
+  useEffect(() => {
+    setIsOpen(isOpenDialog);
+  }, [isOpenDialog]);
 
   function closeModal() {
     setIsOpen(false);
@@ -60,7 +70,11 @@ const DialogModal = ({ children, buttonName, title }: Props) => {
                   >
                     <h1 className="text-lg text-main-light">{title}</h1>
 
-                    <button type="button" className="text-3xl" onClick={closeModal}>
+                    <button
+                      type="button"
+                      className="text-3xl"
+                      onClick={closeModal}
+                    >
                       &times;
                     </button>
                   </Dialog.Title>

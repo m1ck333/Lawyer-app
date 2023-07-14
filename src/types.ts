@@ -14,7 +14,7 @@ export interface User {
   email: string;
   role: Roles;
   jwt?: string;
-  lastActive: string | null;
+  lastLogin?: string | null;
   isActive: boolean;
   selectedRole?: Roles;
 }
