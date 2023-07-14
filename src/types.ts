@@ -7,11 +7,16 @@ export enum Roles {
 }
 
 export interface User {
-  id: string;
-  name: string;
+  id?: number;
+  name?: string;
+  surname?: string;
+  username?: string;
   email: string;
   role: Roles;
-  jwt: string;
+  jwt?: string;
+  lastActive: string | null;
+  isActive: boolean;
+  selectedRole?: Roles;
 }
 
 export type DropDownButton = {

@@ -2,6 +2,7 @@ import Form from "../components/UI/Form";
 import DialogBtn from "../components/UI/DialogModal";
 import { FormInput } from "../types";
 import useCreateUser from "../hooks/useCreateUser";
+import ListOfUsers from "../components/ListOfUsers";
 
 const AdminPanel = () => {
   const {
@@ -69,7 +70,7 @@ const AdminPanel = () => {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-10">Admin panel</h1>
 
       <DialogBtn buttonName="Create new user" title="Create new user">
@@ -80,6 +81,8 @@ const AdminPanel = () => {
           isLoading={isLoading}
         />
       </DialogBtn>
+
+      <ListOfUsers />
     </div>
   );
 };

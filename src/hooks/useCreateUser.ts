@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { User } from "../types";
+import useUserList from "./useUserList";
 
 interface newUserData {
   name: string;
@@ -13,12 +16,13 @@ interface newUserData {
 const useCreateUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { fetchUsers } = useUserList();
 
   const handleCreateUser = async (data: newUserData) => {
     const { name, surname, username, email, password } = data;
@@ -56,11 +60,10 @@ const useCreateUser = () => {
 
     setIsLoading(true);
 
-    // TODO: handleCreateUser logic here
-    setTimeout(() => {
-      setIsLoading(false);
-
-      console.log({
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      
+      await axios.post<User[]>(`${apiUrl}/api/user`, {
         name,
         surname,
         username,
@@ -68,16 +71,26 @@ const useCreateUser = () => {
         password,
       });
 
-      // if success
+      setIsLoading(false);
+
       setName("");
       setSurname("");
       setUsername("");
       setEmail("");
       setPassword("");
+
       toast("Successfully created user!", {
         type: "success",
       });
-    }, 2000);
+
+      fetchUsers(); // Fetch the updated list of users after creating a new user
+    } catch (error) {
+      setIsLoading(false);
+      console.log("Error creating user:", error);
+      toast("Unsuccessfully created user.", {
+        type: "error",
+      });
+    }
   };
 
   return {

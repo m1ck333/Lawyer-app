@@ -14,3 +14,12 @@ button {
 button:disabled {
   @apply !bg-main-dark
 }
+
+input {
+  @apply border border-main-light px-2 py-1 rounded
+}
+
+input:focus {
+  @apply  outline-none shadow-md shadow-minor-light
+}
+
