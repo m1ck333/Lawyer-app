@@ -19,6 +19,13 @@ export interface User {
   selectedRole?: Roles;
 }
 
+export interface Event {
+  id: number;
+  title: string;
+  date: Date;
+  description: string;
+}
+
 export type DropDownButton = {
   to?: string;
   label: string;

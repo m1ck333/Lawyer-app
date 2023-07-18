@@ -30,6 +30,10 @@ const Layout = () => {
               <button>
                 <Link to="/">Home</Link>
               </button>
+
+              <button>
+                <Link to="/calendar">Calendar</Link>
+              </button>
             </li>
 
             <DropdownBtn

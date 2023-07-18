@@ -6,7 +6,7 @@ type Props = {
   formInputs: FormInput[];
   onSubmitHandler: (event: React.FormEvent) => void;
   submitButtonName: string;
-  isLoading: boolean;
+  isLoading?: boolean;
 };
 
 const Form = ({
@@ -14,7 +14,7 @@ const Form = ({
   formInputs,
   onSubmitHandler,
   submitButtonName,
-  isLoading,
+  isLoading = false,
 }: Props) => {
   return (
     <form

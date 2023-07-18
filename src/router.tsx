@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
 import Profile from "./pages/Profile";
 import { Roles } from "./types";
+import CalendarPage from "./pages/Calendar";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/calendar",
+        element: <CalendarPage />,
       },
       {
         path: "/profile",
