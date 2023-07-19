@@ -23,6 +23,7 @@ export interface Event {
   id: number;
   title: string;
   date: Date;
+  time: string;
   description: string;
 }
 
@@ -34,10 +35,14 @@ export type DropDownButton = {
 
 export type FormInput = {
   label: string;
-  error: string;
   placeholder: string;
   value: string;
+  error: string;
   type: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  // onChange: () => void,
+  htmlType: "input" | "textarea";
+  onChange: (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+  ) => void;
 };

@@ -13,35 +13,60 @@ import {
   getMonth,
 } from "date-fns";
 import { useAppDispatch } from "../../redux/hooks";
-import { setMonthIndex } from "../../redux/slices/calendarSlice";
+import { setMonthIndex, setYear } from "../../redux/slices/calendarSlice";
+import { DAYS_OF_WEEK_SHORT } from "../../constants";
 
 interface MiniCalendarProps {
   monthIndex: number;
+  year: number;
 }
 
-const MiniCalendar = ({ monthIndex }: MiniCalendarProps) => {
-  const [currentMonth, setCurrentMonthState] = useState(new Date());
+const MiniCalendar = ({ monthIndex, year }: MiniCalendarProps) => {
+  const [currentDate, setCurrentDate] = useState(() =>
+    startOfMonth(new Date())
+  );
+
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(monthIndex);
+  const [currentYear, setCurrentYear] = useState(year);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    setCurrentMonthState(new Date(currentMonth.getFullYear(), monthIndex));
+    setCurrentMonthIndex(monthIndex);
   }, [monthIndex]);
 
+  useEffect(() => {
+    setCurrentYear(year);
+  }, [year]);
+
+  useEffect(() => {
+    setCurrentDate(startOfMonth(new Date(currentYear, currentMonthIndex)));
+
+    if (currentMonthIndex < 0) {
+      setCurrentMonthIndex(11);
+      setCurrentYear((prev) => prev - 1);
+    } else if (currentMonthIndex > 11) {
+      setCurrentMonthIndex(0);
+      setCurrentYear((prev) => prev + 1);
+    }
+  }, [currentYear, currentMonthIndex]);
+
   const prevMonth = () => {
-    setCurrentMonthState(subMonths(currentMonth, 1));
+    setCurrentDate(subMonths(currentDate, 1));
+    setCurrentMonthIndex((prev) => prev - 1);
   };
 
   const nextMonth = () => {
-    setCurrentMonthState(addMonths(currentMonth, 1));
+    setCurrentDate(addMonths(currentDate, 1));
+    setCurrentMonthIndex((prev) => prev + 1);
   };
 
   const handleDateClick = (date: Date) => {
     dispatch(setMonthIndex(getMonth(date)));
+    dispatch(setYear(currentYear));
   };
-
   const renderDays = () => {
-    const monthStart = startOfMonth(currentMonth);
+    const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
     const startDate = startOfWeek(monthStart, { weekStartsOn: 1 }); // Start on Monday
     const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 }); // End on Sunday
@@ -57,7 +82,7 @@ const MiniCalendar = ({ monthIndex }: MiniCalendarProps) => {
       <div
         key={date.toString()}
         className={`text-center p-2 w-8 h-8 cursor-pointer ${
-          isSameMonth(date, currentMonth) ? "text-black" : "text-gray-400"
+          isSameMonth(date, currentDate) ? "text-black" : "text-gray-400"
         } ${
           isSameDay(date, new Date())
             ? "bg-main-dark text-white rounded-full"
@@ -78,7 +103,7 @@ const MiniCalendar = ({ monthIndex }: MiniCalendarProps) => {
         </div>
 
         <span className="text-xs font-thin">
-          {format(currentMonth, "MMMM yyyy")}
+          {format(currentDate, "MMMM")} {currentYear}
         </span>
 
         <div onClick={nextMonth} className="cursor-pointer font-bold">
@@ -87,13 +112,11 @@ const MiniCalendar = ({ monthIndex }: MiniCalendarProps) => {
       </div>
 
       <div className="grid grid-cols-7 gap-1 px-2 text-xs font-thin">
-        <div className="text-center w-8">M</div>
-        <div className="text-center w-8">T</div>
-        <div className="text-center w-8">W</div>
-        <div className="text-center w-8">T</div>
-        <div className="text-center w-8">F</div>
-        <div className="text-center w-8">S</div>
-        <div className="text-center w-8">S</div>
+        {DAYS_OF_WEEK_SHORT.map((day, i) => (
+          <div key={i} className="text-center w-8">
+            {day}
+          </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-7 gap-1 p-2 text-xs font-thin">

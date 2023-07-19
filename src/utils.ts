@@ -1,25 +1,20 @@
-export const generateCalendarDates = (monthIndex: number): Date[] => {
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  const firstDayOfMonth = new Date(currentYear, monthIndex, 1);
-  const lastDayOfMonth = new Date(currentYear, monthIndex + 1, 0);
-  const startDate = new Date(
-    firstDayOfMonth.getFullYear(),
-    firstDayOfMonth.getMonth(),
-    firstDayOfMonth.getDate() - firstDayOfMonth.getDay()
-  );
-  const endDate = new Date(
-    lastDayOfMonth.getFullYear(),
-    lastDayOfMonth.getMonth(),
-    lastDayOfMonth.getDate() + (6 - lastDayOfMonth.getDay())
-  );
+export const generateCalendarDates = (year: number, monthIndex: number): Date[] => {
+  const firstDayOfMonth = new Date(year, monthIndex, 1);
+  const startDayOfWeek = 1; // Monday (you can change this if you prefer Sunday as the start of the week)
+  const dayOfWeekIndex = firstDayOfMonth.getDay();
+  const daysToAdjust = (dayOfWeekIndex + 7 - startDayOfWeek) % 7;
+  const startDate = new Date(firstDayOfMonth);
+  startDate.setDate(startDate.getDate() - daysToAdjust);
+
+  const lastDayOfMonth = new Date(year, monthIndex + 1, 0);
+  const endDate = new Date(lastDayOfMonth);
+  const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
 
   const calendarDates: Date[] = [];
-  let currentDateIter = startDate;
-
-  while (currentDateIter <= endDate) {
-    calendarDates.push(new Date(currentDateIter));
-    currentDateIter.setDate(currentDateIter.getDate() + 1);
+  for (let i = 0; i < totalDays; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(currentDate.getDate() + i);
+    calendarDates.push(currentDate);
   }
 
   return calendarDates;

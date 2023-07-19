@@ -8,38 +8,68 @@ const EVENTS: Event[] = [
     id: 1,
     title: "Meeting",
     date: new Date("2023-07-10T10:00:00"),
+    time: "08:20",
     description: "Discuss project updates",
   },
   {
     id: 2,
     title: "Lunch",
     date: new Date("2023-07-11T12:00:00"),
+    time: "03:20",
     description: "Meet with colleagues for lunch",
   },
   {
     id: 3,
     title: "Lunch2",
+    time: "01:20",
     date: new Date("2023-07-11T12:00:00"),
     description: "Meet with colleagues for lunch2",
+  },
+  {
+    id: 4,
+    title: "Lunch3",
+    time: "11:20",
+    date: new Date("2023-07-11T12:00:00"),
+    description: "Meet with colleagues for lunch3",
+  },
+  {
+    id: 5,
+    title: "Lunch4",
+    time: "14:20",
+    date: new Date("2023-07-11T12:00:00"),
+    description: "Meet with colleagues for lunch4",
+  },
+  {
+    id: 6,
+    title: "Lunch5",
+    time: "13:22",
+    date: new Date("2023-07-11T12:00:00"),
+    description: "Meet with colleagues for lunch5",
   },
   // Add more dummy events as needed
 ];
 
 const useCalendar = () => {
-  const monthIndex = useAppSelector((state) => state.calendar.monthIndex);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
+  const [isViewEventModalOpen, setIsViewEventModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedEvents, setSelectedEvents] = useState<Event[]>([]); // Track selected events
-
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState<Date>(new Date());
+  const [time, setTime] = useState("");
 
-  const handleCreateEvent = async (data: Event) => {
-    const { title, date, description } = data;
+  const monthIndex = useAppSelector((state) => state.calendar.monthIndex);
+  const year = useAppSelector((state) => state.calendar.year);
+
+  const handleCreateEvent = async (
+    e: React.FormEvent,
+    type: "create" | "update"
+  ) => {
+    e.preventDefault();
 
     setIsLoading(true);
 
@@ -59,53 +89,49 @@ const useCalendar = () => {
       errors["description"] = "Enter a description";
     }
 
+    if (!time) {
+      errors["time"] = "Enter a time";
+    }
+
     if (Object.keys(errors).length > 0) {
+      setIsLoading(false);
       setErrors(errors);
       return;
     }
 
-    // Simulating event creation with a delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (type === "create") {
+      // Simulating event creation with a delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    toast("Successfully created event.", {
-      type: "success",
-    });
+      toast("Successfully created event.", {
+        type: "success",
+      });
 
-    console.log(data);
+      clearInputs();
+    } else if (type === "update") {
+      // Simulating event creation with a delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      toast("Successfully updated event.", {
+        type: "success",
+      });
+    }
+
+    console.log({ title, description, date, time });
 
     setIsLoading(false);
   };
 
-  const handleUpdateEvent = (eventId: number, data: Event) => {
-    // Logic to update an existing event
-    const updatedEvents = selectedEvents.map((event) =>
-      event.id === eventId ? { ...event, ...data } : event
-    );
-    setSelectedEvents(updatedEvents);
+  const handleDeleteEvent = () => {
+    setIsLoading(true);
 
-    setIsEventModalOpen(false);
-    setSelectedDate(null);
-
-    // Dispatch any actions or API requests related to event update
-
-    // Example toast notification
-    toast("Event updated successfully!", { type: "success" });
-  };
-
-  const handleDeleteEvent = (eventId: number) => {
-    // Logic to delete an event
-    const updatedEvents = selectedEvents.filter(
-      (event) => event.id !== eventId
-    );
-    setSelectedEvents(updatedEvents);
-
-    setIsEventModalOpen(false);
-    setSelectedDate(null);
-
-    // Dispatch any actions or API requests related to event deletion
-
-    // Example toast notification
-    toast("Event deleted successfully!", { type: "success" });
+    setTimeout(() => {
+      setSelectedDate(null);
+      toast("Event deleted successfully!", { type: "success" });
+      clearInputs();
+      setIsViewEventModalOpen(false);
+      setIsLoading(false);
+    }, 2000);
   };
 
   const formInputs: FormInput[] = [
@@ -113,6 +139,7 @@ const useCalendar = () => {
       label: "Title",
       placeholder: "Title",
       type: "text",
+      htmlType: "input",
       onChange: (e) => setTitle(e.target.value),
       value: title,
       error: errors["title"],
@@ -121,6 +148,7 @@ const useCalendar = () => {
       label: "Description",
       placeholder: "Description",
       type: "text",
+      htmlType: "textarea",
       onChange: (e) => setDescription(e.target.value),
       value: description,
       error: errors["description"],
@@ -129,18 +157,23 @@ const useCalendar = () => {
       label: "Date",
       placeholder: "Date",
       type: "date",
+      htmlType: "input",
       onChange: (e) => setDate(new Date(e.target.value)),
       value: date.toISOString().split("T")[0],
       error: errors["date"],
     },
+    {
+      label: "Time",
+      placeholder: "Time",
+      type: "time",
+      htmlType: "input",
+      onChange: (e) => setTime(e.target.value),
+      value: time,
+      error: errors["time"],
+    },
   ];
 
-  const handleDateClick = (date: Date, events: Event[]) => {
-    const selectedEvents = events.filter(
-      (event) => event.date.toDateString() === date.toDateString()
-    );
-    setSelectedEvents(selectedEvents);
-
+  const handleDateClick = (date: Date) => {
     setSelectedDate(date);
 
     const nextDay = new Date(
@@ -148,46 +181,60 @@ const useCalendar = () => {
       date.getMonth(),
       date.getDate() + 1
     );
+
     setDate(nextDay); // Update the date input value
 
-    setIsEventModalOpen(true);
+    setIsCreateEventModalOpen(true);
+  };
+
+  const clearInputs = () => {
+    setTitle("");
+    setDescription("");
+    setDate(new Date());
+    setTime("");
+  };
+
+  const handleEventClick = (date: Date, event: Event, e: React.MouseEvent) => {
+    // Stop the propagation of the click event to prevent handleDateClick from being triggered
+    e.stopPropagation();
+
+    setSelectedEvent(event);
+    setTitle(event.title);
+    setDescription(event.description);
+    setDate(event.date);
+    setTime(event.time);
+
+    setIsViewEventModalOpen(true);
+
+    console.log("Clicked Event:", event, date);
   };
 
   const handleEventModalClose = () => {
-    setIsEventModalOpen(false);
     setSelectedDate(null);
-    setSelectedEvents([]);
-  };
+    setSelectedEvent(null);
+    setIsCreateEventModalOpen(false);
+    setIsViewEventModalOpen(false);
 
-  const handleCreateOrUpdateEvent = () => {
-    const eventData: Event = {
-      id: selectedDate?.getTime() ?? Date.now(),
-      title,
-      date: selectedDate!,
-      description,
-    };
-
-    if (selectedDate) {
-      handleUpdateEvent(selectedDate.getTime(), eventData);
-    } else {
-      handleCreateEvent(eventData);
-    }
+    clearInputs();
   };
 
   return {
-    isEventModalOpen,
+    isCreateEventModalOpen,
+    isViewEventModalOpen,
     selectedDate,
-    selectedEvents,
+    selectedEvent,
     handleDateClick,
+    handleEventClick,
     handleEventModalClose,
     formInputs,
-    handleCreateOrUpdateEvent,
+    handleCreateEvent,
     handleDeleteEvent,
     isLoading,
     events: EVENTS,
     currentMonth,
     setCurrentMonth,
     monthIndex,
+    year,
   };
 };
 

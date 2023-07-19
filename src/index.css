@@ -4,6 +4,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
 body {
   @apply bg-main-dark text-main-light font-poppins;
 }
@@ -16,32 +29,10 @@ button:disabled {
   @apply !bg-main-dark;
 }
 
-input {
+input, textarea {
   @apply border border-main-light px-2 py-1 rounded;
 }
 
-input:focus {
+input:focus, textarea:focus {
   @apply outline-none shadow-md shadow-minor-light;
 }
-
-/* Big calendar */
-.big-calendar {
-  @apply w-full bg-minor-dark p-2 text-main-light;
-}
-
-.big-calendar button {
-  @apply !bg-transparent;
-}
-
-.big-calendar .rbc-off-range-bg {
-  @apply bg-slate-600;
-}
-
-.big-calendar .rbc-today {
-  @apply !bg-minor-light;
-}
-
-.big-calendar .rbc-btn-group button {
-  @apply !text-main-light;
-}
-/* End big calendar */

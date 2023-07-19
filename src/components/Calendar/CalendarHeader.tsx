@@ -1,10 +1,22 @@
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { useState, useEffect } from 'react';
+import { useAppDispatch } from '../../redux/hooks';
 import { setMonthIndex } from '../../redux/slices/calendarSlice';
 import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/react/20/solid';
+import { format, startOfMonth } from 'date-fns';
 
-const CalendarHeader = () => {
-  const monthIndex = useAppSelector((state) => state.calendar.monthIndex);
+interface Props {
+  monthIndex: number;
+  year: number;
+}
+
+const CalendarHeader = ({year, monthIndex}: Props) => {
+  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
+
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    setCurrentMonth(startOfMonth(new Date(new Date().getFullYear(), monthIndex)));
+  }, [monthIndex]);
 
   const handlePrevMonth = () => {
     dispatch(setMonthIndex(monthIndex - 1));
@@ -14,13 +26,7 @@ const CalendarHeader = () => {
     dispatch(setMonthIndex(monthIndex + 1));
   };
 
-  const currentYear = new Date().getFullYear();
-
-  const displayMonth = new Date(currentYear, monthIndex).toLocaleString('en-US', {
-    month: 'long',
-  });
-
-  const displayYear = currentYear;
+  const displayMonth = format(currentMonth, 'MMMM');
 
   return (
     <div className="flex justify-between mb-4">
@@ -29,7 +35,7 @@ const CalendarHeader = () => {
       </button>
 
       <h2 className="text-lg font-semibold">
-        {`${displayMonth} ${displayYear}`}
+        {`${displayMonth} ${year}`}
       </h2>
 
       <button onClick={handleNextMonth}>
