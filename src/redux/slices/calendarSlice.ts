@@ -1,18 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Event } from "../../types";
 
 interface CalendarState {
   monthIndex: number;
   year: number;
   selectedDate: Date | null;
-  events: Event[];
 }
 
 const initialState: CalendarState = {
   monthIndex: new Date().getMonth(),
   year: new Date().getFullYear(),
   selectedDate: null,
-  events: [],
 };
 
 const calendarSlice = createSlice({
@@ -50,10 +47,6 @@ const calendarSlice = createSlice({
     setSelectedDate(state, action: PayloadAction<Date>) {
       state.selectedDate = action.payload;
     },
-    setEvents(state, action: PayloadAction<Event[]>) {
-      state.events = action.payload;
-    },
-    // Other reducers
   },
 });
 
@@ -63,7 +56,6 @@ export const {
   setPrevMonth,
   setNextMonth,
   setSelectedDate,
-  setEvents,
 } = calendarSlice.actions;
 
 export default calendarSlice.reducer;

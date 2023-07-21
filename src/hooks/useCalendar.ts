@@ -1,69 +1,63 @@
-import { useState } from "react";
-import { Event, FormInput } from "../types";
+import { useState, useEffect } from "react";
+import { Event, EventTypes, FormInput } from "../types";
 import { toast } from "react-toastify";
-import { useAppSelector } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { setEvents } from "../redux/slices/eventSlice";
 
-const EVENTS: Event[] = [
+const DUMMY_EVENTS: Event[] = [
   {
     id: 1,
-    title: "Meeting",
-    date: new Date("2023-07-10T10:00:00"),
+    title: "Dummy Event 1",
+    date: "2023-07-15",
     time: "08:20",
-    description: "Discuss project updates",
+    description: "This is a dummy event",
+    type: EventTypes.Other,
   },
   {
     id: 2,
-    title: "Lunch",
-    date: new Date("2023-07-11T12:00:00"),
+    title: "Dummy Event 2",
+    date: "2023-07-16",
     time: "03:20",
-    description: "Meet with colleagues for lunch",
+    description: "This is another dummy event",
+    type: EventTypes.Hearing,
   },
-  {
-    id: 3,
-    title: "Lunch2",
-    time: "01:20",
-    date: new Date("2023-07-11T12:00:00"),
-    description: "Meet with colleagues for lunch2",
-  },
-  {
-    id: 4,
-    title: "Lunch3",
-    time: "11:20",
-    date: new Date("2023-07-11T12:00:00"),
-    description: "Meet with colleagues for lunch3",
-  },
-  {
-    id: 5,
-    title: "Lunch4",
-    time: "14:20",
-    date: new Date("2023-07-11T12:00:00"),
-    description: "Meet with colleagues for lunch4",
-  },
-  {
-    id: 6,
-    title: "Lunch5",
-    time: "13:22",
-    date: new Date("2023-07-11T12:00:00"),
-    description: "Meet with colleagues for lunch5",
-  },
-  // Add more dummy events as needed
 ];
 
 const useCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [isViewEventModalOpen, setIsViewEventModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [eventType, setEventType] = useState<EventTypes[number]>(
+    EventTypes.Other
+  );
 
+  const dispatch = useAppDispatch();
+  const events = useAppSelector((state) => state.events.events);
   const monthIndex = useAppSelector((state) => state.calendar.monthIndex);
   const year = useAppSelector((state) => state.calendar.year);
+
+  const eventTypesArray: EventTypes[] = Object.values(EventTypes);
+
+  useEffect(() => {
+    setIsLoadingEvents(true);
+
+    const fetchEventsFromAPI = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      dispatch(setEvents(DUMMY_EVENTS));
+      setIsLoadingEvents(false)
+    };
+
+    fetchEventsFromAPI();
+  }, []);
 
   const handleCreateEvent = async (
     e: React.FormEvent,
@@ -73,7 +67,7 @@ const useCalendar = () => {
 
     setIsLoading(true);
 
-    setErrors({}); // Clear errors before validating the form inputs
+    setErrors({});
 
     const errors: { [key: string]: string } = {};
 
@@ -126,7 +120,7 @@ const useCalendar = () => {
     setIsLoading(true);
 
     setTimeout(() => {
-      setSelectedDate(null);
+      setSelectedDate("");
       toast("Event deleted successfully!", { type: "success" });
       clearInputs();
       setIsViewEventModalOpen(false);
@@ -158,8 +152,8 @@ const useCalendar = () => {
       placeholder: "Date",
       type: "date",
       htmlType: "input",
-      onChange: (e) => setDate(new Date(e.target.value)),
-      value: date.toISOString().split("T")[0],
+      onChange: (e) => setDate(e.target.value),
+      value: date,
       error: errors["date"],
     },
     {
@@ -173,16 +167,10 @@ const useCalendar = () => {
     },
   ];
 
-  const handleDateClick = (date: Date) => {
+  const handleDateClick = (date: string) => {
     setSelectedDate(date);
 
-    const nextDay = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate() + 1
-    );
-
-    setDate(nextDay); // Update the date input value
+    setDate(date);
 
     setIsCreateEventModalOpen(true);
   };
@@ -190,28 +178,28 @@ const useCalendar = () => {
   const clearInputs = () => {
     setTitle("");
     setDescription("");
-    setDate(new Date());
+    setDate("");
     setTime("");
   };
 
-  const handleEventClick = (date: Date, event: Event, e: React.MouseEvent) => {
-    // Stop the propagation of the click event to prevent handleDateClick from being triggered
+  const handleEventClick = (event: Event, e: React.MouseEvent) => {
     e.stopPropagation();
 
     setSelectedEvent(event);
+    setEventType(event.type);
     setTitle(event.title);
     setDescription(event.description);
     setDate(event.date);
     setTime(event.time);
 
     setIsViewEventModalOpen(true);
-
-    console.log("Clicked Event:", event, date);
   };
 
   const handleEventModalClose = () => {
-    setSelectedDate(null);
+    setSelectedDate("");
     setSelectedEvent(null);
+    setErrors({});
+    setEventType(EventTypes.Other);
     setIsCreateEventModalOpen(false);
     setIsViewEventModalOpen(false);
 
@@ -223,6 +211,8 @@ const useCalendar = () => {
     isViewEventModalOpen,
     selectedDate,
     selectedEvent,
+    eventType,
+    setEventType,
     handleDateClick,
     handleEventClick,
     handleEventModalClose,
@@ -230,11 +220,13 @@ const useCalendar = () => {
     handleCreateEvent,
     handleDeleteEvent,
     isLoading,
-    events: EVENTS,
+    isLoadingEvents,
+    events,
     currentMonth,
     setCurrentMonth,
     monthIndex,
     year,
+    eventTypesArray,
   };
 };
 

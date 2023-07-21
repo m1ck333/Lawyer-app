@@ -1,9 +1,11 @@
 import DialogModal from "../components/UI/DialogModal";
 import CalendarHeader from "../components/Calendar/CalendarHeader";
 import Form from "../components/UI/Form";
-import MiniCalendar from "../components/Calendar/MiniCalendar";
 import CalendarBody from "../components/Calendar/CalendarBody";
 import useCalendar from "../hooks/useCalendar";
+import CalendarSidebar from "../components/Calendar/CalendarSidebar";
+import RadioButton from "../components/UI/RadioButton";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
 const Calendar = () => {
   const {
@@ -11,56 +13,65 @@ const Calendar = () => {
     handleEventClick,
     isCreateEventModalOpen,
     isViewEventModalOpen,
+    eventType,
+    setEventType,
     handleEventModalClose,
     formInputs,
     handleCreateEvent,
     handleDeleteEvent,
     isLoading,
-    events,
+    isLoadingEvents,
     monthIndex,
     year,
+    eventTypesArray,
   } = useCalendar();
 
-  // const handleFormSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   handleCreateEvent();
-  // };
+  const formAdditionalFields = () => {
+    return (
+      <div className="flex flex-col">
+        {eventTypesArray.map((eventTypeArray) => (
+          <RadioButton
+            key={eventTypeArray}
+            id={eventTypeArray}
+            name="type"
+            eventType={eventTypeArray}
+            selectedEventType={eventType}
+            onChange={setEventType}
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="flex h-screen w-screen">
-      {/* Sidebar */}
-      <div className="flex flex-col items-center p-4 gap-4 w-1/5 bg-main-light text-main-dark">
-        <DialogModal
-          buttonName="Create Event"
-          title="Create Event"
-          isOpenDialog={isCreateEventModalOpen}
-          onClose={handleEventModalClose}
-        >
-          <div className="flex flex-col items-center">
-            <Form
-              classes="w-max"
-              formInputs={formInputs}
-              onSubmitHandler={(e) => handleCreateEvent(e, "create")}
-              submitButtonName="Create"
-              isLoading={isLoading}
-            />
-          </div>
-        </DialogModal>
-
-        <MiniCalendar monthIndex={monthIndex} year={year} />
-      </div>
+      <CalendarSidebar
+        isCreateEventModalOpen={isCreateEventModalOpen}
+        handleEventModalClose={handleEventModalClose}
+        formInputs={formInputs}
+        handleCreateEvent={handleCreateEvent}
+        isLoading={isLoading}
+        monthIndex={monthIndex}
+        year={year}
+        eventTypesArray={eventTypesArray}
+        formAdditionalFields={formAdditionalFields}
+      />
 
       <div className="flex-1">
         <div className="mx-auto px-4 py-8">
           <CalendarHeader year={year} monthIndex={monthIndex} />
 
-          <CalendarBody
-            onDateClick={handleDateClick}
-            onEventClick={handleEventClick}
-            events={events}
-            monthIndex={monthIndex}
-            year={year}
-          />
+          {/* Pass the filteredEvents instead of events */}
+          {isLoadingEvents ? (
+            <LoadingSpinner />
+          ) : (
+            <CalendarBody
+              onDateClick={handleDateClick}
+              onEventClick={handleEventClick}
+              monthIndex={monthIndex}
+              year={year}
+            />
+          )}
         </div>
       </div>
 
@@ -80,6 +91,7 @@ const Calendar = () => {
               }}
               submitButtonName="Update"
               isLoading={isLoading}
+              additionalFields={formAdditionalFields}
               additionalButtons={[
                 <button
                   className="ml-1 !bg-red-500 hover:!bg-red-300"

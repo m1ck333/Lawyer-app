@@ -7,6 +7,7 @@ type Props = {
   onSubmitHandler: (event: React.FormEvent) => void;
   submitButtonName: string;
   isLoading?: boolean;
+  additionalFields?: () => JSX.Element;
   additionalButtons?: JSX.Element[];
 };
 
@@ -16,6 +17,7 @@ const Form = ({
   onSubmitHandler,
   submitButtonName,
   isLoading = false,
+  additionalFields,
   additionalButtons,
 }: Props) => {
   return (
@@ -52,6 +54,8 @@ const Form = ({
           )}
         </div>
       ))}
+
+      {additionalFields && additionalFields()}
 
       <div className="flex items-center justify-center">
         {isLoading ? (

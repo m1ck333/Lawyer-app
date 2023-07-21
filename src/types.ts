@@ -1,3 +1,4 @@
+// User
 export enum Roles {
   admin = "admin",
   lawyer = "lawyer",
@@ -18,15 +19,27 @@ export interface User {
   isActive: boolean;
   selectedRole?: Roles;
 }
+// End user
+
+// Event
+export enum EventTypes {
+  Hearing = "hearing",
+  Meeting = "meeting",
+  Report = "report",
+  Other = "other",
+}
 
 export interface Event {
   id: number;
   title: string;
-  date: Date;
-  time: string;
   description: string;
+  date: string;
+  time: string;
+  type: EventTypes;
 }
+// End event
 
+// UI
 export type DropDownButton = {
   to?: string;
   label: string;
@@ -46,3 +59,4 @@ export type FormInput = {
       | React.ChangeEvent<HTMLTextAreaElement>
   ) => void;
 };
+// End UI

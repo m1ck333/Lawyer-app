@@ -3,18 +3,16 @@ import {
   format,
   addMonths,
   subMonths,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
   isSameMonth,
   isSameDay,
-  addDays,
   getMonth,
+  startOfMonth,
 } from "date-fns";
+
 import { useAppDispatch } from "../../redux/hooks";
 import { setMonthIndex, setYear } from "../../redux/slices/calendarSlice";
 import { DAYS_OF_WEEK_SHORT } from "../../constants";
+import { generateMiniCalendarDates } from "../../utils";
 
 interface MiniCalendarProps {
   monthIndex: number;
@@ -63,22 +61,16 @@ const MiniCalendar = ({ monthIndex, year }: MiniCalendarProps) => {
 
   const handleDateClick = (date: Date) => {
     dispatch(setMonthIndex(getMonth(date)));
-    dispatch(setYear(currentYear));
+    dispatch(setYear(date.getFullYear()));
   };
+
   const renderDays = () => {
-    const monthStart = startOfMonth(currentDate);
-    const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart, { weekStartsOn: 1 }); // Start on Monday
-    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 }); // End on Sunday
+    const calendarDates = generateMiniCalendarDates(
+      currentYear,
+      currentMonthIndex
+    );
 
-    const days = [];
-    let day = startDate;
-    while (day <= endDate) {
-      days.push(day);
-      day = addDays(day, 1);
-    }
-
-    return days.map((date) => (
+    return calendarDates.map((date) => (
       <div
         key={date.toString()}
         className={`text-center p-2 w-8 h-8 cursor-pointer ${

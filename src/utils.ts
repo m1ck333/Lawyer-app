@@ -1,21 +1,26 @@
-export const generateCalendarDates = (year: number, monthIndex: number): Date[] => {
-  const firstDayOfMonth = new Date(year, monthIndex, 1);
-  const startDayOfWeek = 1; // Monday (you can change this if you prefer Sunday as the start of the week)
-  const dayOfWeekIndex = firstDayOfMonth.getDay();
-  const daysToAdjust = (dayOfWeekIndex + 7 - startDayOfWeek) % 7;
-  const startDate = new Date(firstDayOfMonth);
-  startDate.setDate(startDate.getDate() - daysToAdjust);
+import {
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  addDays,
+} from "date-fns";
 
-  const lastDayOfMonth = new Date(year, monthIndex + 1, 0);
-  const endDate = new Date(lastDayOfMonth);
-  const totalDays = (endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24);
+export const generateMiniCalendarDates = (year: number, monthIndex: number): Date[] => {
+  const currentDate = startOfMonth(new Date(year, monthIndex));
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(monthStart);
+  const startDate = startOfWeek(monthStart, { weekStartsOn: 1 }); // Start on Monday
+  const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 }); // End on Sunday
 
-  const calendarDates: Date[] = [];
-  for (let i = 0; i < totalDays; i++) {
-    const currentDate = new Date(startDate);
-    currentDate.setDate(currentDate.getDate() + i);
-    calendarDates.push(currentDate);
+  const days = [];
+
+  let day = startDate;
+  
+  while (day <= endDate) {
+    days.push(day);
+    day = addDays(day, 1);
   }
 
-  return calendarDates;
+  return days;
 };
