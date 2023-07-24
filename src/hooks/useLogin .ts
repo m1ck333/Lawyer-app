@@ -7,11 +7,12 @@ import useUserAuth from "./useUserAuth ";
 import { Roles, User } from "../types";
 
 const USER: User = {
-  id: "123",
+  id: 123,
   name: "John Doe",
   email: "john@example.com",
   role: Roles["admin"],
   jwt: "this_is_jwt",
+  isActive: true,
 };
 
 interface LoginData {
@@ -29,7 +30,7 @@ const useLogin = () => {
     const { email, password } = data;
 
     setErrors({}); // Clear errors before validating the form inputs
-    
+
     const errors: { [key: string]: string } = {};
 
     if (!email) {

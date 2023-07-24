@@ -20,12 +20,8 @@ const eventSlice = createSlice({
   initialState,
   reducers: {
     setEvents: (state, action: PayloadAction<Event[]>) => {
-      console.log("1");
-      
       state.events = action.payload;
-      console.log("2");
       state.filteredEvents = action.payload;
-      console.log("3");
     },
     toggleSelectedEventType: (state, action: PayloadAction<EventTypes>) => {
       const eventType = action.payload;
@@ -50,7 +46,9 @@ const eventSlice = createSlice({
     },
     removeEvent: (state, action: PayloadAction<number>) => {
       const eventIdToRemove = action.payload;
-      state.events = state.events.filter((event) => event.id !== eventIdToRemove);
+      state.events = state.events.filter(
+        (event) => event.id !== eventIdToRemove
+      );
       state.filteredEvents = state.filteredEvents.filter(
         (event) => event.id !== eventIdToRemove
       );
@@ -58,10 +56,6 @@ const eventSlice = createSlice({
   },
 });
 
-export const {
-  setEvents,
-  toggleSelectedEventType,
-  addEvent,
-  removeEvent,
-} = eventSlice.actions;
+export const { setEvents, toggleSelectedEventType, addEvent, removeEvent } =
+  eventSlice.actions;
 export default eventSlice.reducer;

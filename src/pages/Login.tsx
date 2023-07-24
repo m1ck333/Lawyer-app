@@ -22,18 +22,18 @@ const Login = () => {
       error: errors["email"],
       placeholder: "Your email or username",
       value: email,
-      type:"text",
-      onChange: (e) =>
-        setEmail(e.target.value),
+      type: "text",
+      onChange: (e) => setEmail(e.target.value),
+      htmlType: "input",
     },
     {
       label: "Password",
       error: errors["password"],
       placeholder: "Your password",
       value: password,
-      type:"password",
-      onChange: (e) =>
-        setPassword(e.target.value),
+      type: "password",
+      onChange: (e) => setPassword(e.target.value),
+      htmlType: "input",
     },
   ];
 

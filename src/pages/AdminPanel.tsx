@@ -34,6 +34,7 @@ const AdminPanel = () => {
       value: name,
       type: "text",
       onChange: (e) => setName(e.target.value),
+      htmlType: "input",
     },
     {
       label: "Surname",
@@ -42,6 +43,7 @@ const AdminPanel = () => {
       value: surname,
       type: "text",
       onChange: (e) => setSurname(e.target.value),
+      htmlType: "input",
     },
     {
       label: "Username",
@@ -50,7 +52,9 @@ const AdminPanel = () => {
       value: username,
       type: "text",
       onChange: (e) => setUsername(e.target.value),
+      htmlType: "input",
     },
+
     {
       label: "Email",
       error: errors["email"],
@@ -58,6 +62,7 @@ const AdminPanel = () => {
       value: email,
       type: "email",
       onChange: (e) => setEmail(e.target.value),
+      htmlType: "input",
     },
     {
       label: "Password",
@@ -66,6 +71,7 @@ const AdminPanel = () => {
       value: password,
       type: "password",
       onChange: (e) => setPassword(e.target.value),
+      htmlType: "input",
     },
   ];
 

@@ -36,7 +36,7 @@ const DropdownBtn = ({ buttonName, dropDownButtons, needArrowDown }: Props) => {
   };
 
   return (
-    <Menu as="div" className="relative inline-block text-left">
+    <Menu as="div" className="relative inline-block text-left z-10">
       <div>
         <Menu.Button className="inline-flex w-full justify-center rounded-md bg-main-dark bg-opacity-20 px-4 py-2  hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-main-light focus-visible:ring-opacity-75">
           {buttonName === "Profile" ? (

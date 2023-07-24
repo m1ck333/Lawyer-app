@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setMonthIndex, setYear } from "../../redux/slices/calendarSlice";
 import { Event } from "../../types";
-import { generateMiniCalendarDates } from "../../utils";
+import { formatDateToKebab, generateMiniCalendarDates } from "../../utils";
 import { DAYS_OF_WEEK, EVENT_TYPE_COLORS } from "../../constants";
 import { getMonth } from "date-fns";
 
@@ -30,7 +30,7 @@ const CalendarBody = ({
     const isCurrentMonth = date.getMonth() === currentDate.getMonth();
 
     if (isCurrentMonth) {
-      onDateClick(date.toISOString().split("T")[0]);
+      onDateClick(formatDateToKebab(date));
     } else {
       dispatch(setMonthIndex(getMonth(date)));
       dispatch(setYear(date.getFullYear()));

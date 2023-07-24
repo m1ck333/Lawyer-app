@@ -17,6 +17,26 @@
   }
 }
 
+/* Slider */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+/* End slider */
+
 body {
   @apply bg-main-dark text-main-light font-poppins;
 }
@@ -29,10 +49,12 @@ button:disabled {
   @apply !bg-main-dark;
 }
 
-input, textarea {
+input,
+textarea {
   @apply border border-main-light px-2 py-1 rounded;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
   @apply outline-none shadow-md shadow-minor-light;
 }

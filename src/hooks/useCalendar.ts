@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Event, EventTypes, FormInput } from "../types";
 import { toast } from "react-toastify";
+
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setEvents } from "../redux/slices/eventSlice";
+import { Event, EventTypes, FormInput } from "../types";
 
 const DUMMY_EVENTS: Event[] = [
   {
@@ -21,14 +22,91 @@ const DUMMY_EVENTS: Event[] = [
     description: "This is another dummy event",
     type: EventTypes.Hearing,
   },
+  {
+    id: 3,
+    title: "Dummy Event 3",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Meeting,
+  },
+  {
+    id: 4,
+    title: "Dummy Event 4",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Hearing,
+  },
+  {
+    id: 5,
+    title: "Dummy Event 5",
+    date: "2023-07-30",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Report,
+  },
+  {
+    id: 6,
+    title: "Dummy Event 6",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Hearing,
+  },
+  {
+    id: 7,
+    title: "Dummy Event 7",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Hearing,
+  },
+  {
+    id: 8,
+    title: "Dummy Event 8",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Hearing,
+  },
+  {
+    id: 9,
+    title: "Dummy Event 9",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Meeting,
+  },
+  {
+    id: 10,
+    title: "Dummy Event 10",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Meeting,
+  },
+  {
+    id: 11,
+    title: "Dummy Event 11",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Meeting,
+  },
+  {
+    id: 12,
+    title: "Dummy Event 12",
+    date: "2023-07-24",
+    time: "03:20",
+    description: "This is another dummy event",
+    type: EventTypes.Meeting,
+  },
 ];
 
 const useCalendar = () => {
-  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [isViewEventModalOpen, setIsViewEventModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingEvents, setIsLoadingEvents] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -41,7 +119,6 @@ const useCalendar = () => {
   );
 
   const dispatch = useAppDispatch();
-  const events = useAppSelector((state) => state.events.events);
   const monthIndex = useAppSelector((state) => state.calendar.monthIndex);
   const year = useAppSelector((state) => state.calendar.year);
 
@@ -53,7 +130,7 @@ const useCalendar = () => {
     const fetchEventsFromAPI = async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       dispatch(setEvents(DUMMY_EVENTS));
-      setIsLoadingEvents(false)
+      setIsLoadingEvents(false);
     };
 
     fetchEventsFromAPI();
@@ -120,7 +197,6 @@ const useCalendar = () => {
     setIsLoading(true);
 
     setTimeout(() => {
-      setSelectedDate("");
       toast("Event deleted successfully!", { type: "success" });
       clearInputs();
       setIsViewEventModalOpen(false);
@@ -168,8 +244,6 @@ const useCalendar = () => {
   ];
 
   const handleDateClick = (date: string) => {
-    setSelectedDate(date);
-
     setDate(date);
 
     setIsCreateEventModalOpen(true);
@@ -185,7 +259,6 @@ const useCalendar = () => {
   const handleEventClick = (event: Event, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    setSelectedEvent(event);
     setEventType(event.type);
     setTitle(event.title);
     setDescription(event.description);
@@ -196,8 +269,6 @@ const useCalendar = () => {
   };
 
   const handleEventModalClose = () => {
-    setSelectedDate("");
-    setSelectedEvent(null);
     setErrors({});
     setEventType(EventTypes.Other);
     setIsCreateEventModalOpen(false);
@@ -207,26 +278,22 @@ const useCalendar = () => {
   };
 
   return {
-    isCreateEventModalOpen,
-    isViewEventModalOpen,
-    selectedDate,
-    selectedEvent,
-    eventType,
-    setEventType,
     handleDateClick,
     handleEventClick,
+    isCreateEventModalOpen,
+    isViewEventModalOpen,
+    eventType,
+    setEventType,
     handleEventModalClose,
     formInputs,
     handleCreateEvent,
     handleDeleteEvent,
     isLoading,
     isLoadingEvents,
-    events,
-    currentMonth,
-    setCurrentMonth,
     monthIndex,
     year,
     eventTypesArray,
+    events: DUMMY_EVENTS,
   };
 };
 
