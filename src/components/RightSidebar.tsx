@@ -49,7 +49,7 @@ const RightSidebar = ({ isOpen, onClose }: Props) => {
   return (
     <>
       <div
-        className={`fixed top-0 right-0 h-screen bg-minor-dark w-64 p-4 border-2 border-main-light ${
+        className={`fixed top-0 right-0 h-screen z-10 bg-minor-dark w-64 p-4 border-2 border-main-light ${
           isOpen && !isLoadingEvents ? "flex flex-col" : "hidden"
         }`}
         style={{
