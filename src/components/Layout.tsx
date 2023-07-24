@@ -36,6 +36,10 @@ const Layout = () => {
               </button>
             </li>
 
+            <button>
+                <Link to="/subjects">Subjects</Link>
+            </button>
+
             <DropdownBtn
               buttonName="Profile"
               dropDownButtons={dropDownButtons}

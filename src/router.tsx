@@ -10,6 +10,7 @@ import AdminPanel from "./pages/AdminPanel";
 import Profile from "./pages/Profile";
 import { Roles } from "./types";
 import CalendarPage from "./pages/Calendar";
+import Subjects from "./pages/Subjects";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/subjects",
+        element: <Subjects />,
       },
       {
         path: "/admin",
