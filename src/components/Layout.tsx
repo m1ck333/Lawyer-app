@@ -1,11 +1,21 @@
+import  { useState, useEffect } from 'react';
 import { Link, Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 import useUserAuth from "../hooks/useUserAuth ";
 import { DropDownButton, Roles } from "../types";
 import DropdownBtn from "./UI/DropdownBtn";
+import { useLocation } from "react-router-dom";
 
-const Layout = () => {
+const Layout = () => {  
+  
+  const location = useLocation();
+  const [url, setUrl] = useState('');
+  useEffect(() => {
+    setUrl(location.pathname);
+  }, [location]);
+  
+
   const { logoutUser, user } = useUserAuth({ enableLocalStorage: true });
 
   const dropDownButtons: DropDownButton[] = [
@@ -27,19 +37,10 @@ const Layout = () => {
 
           <ul className="flex space-x-4 text-sm font-medium text-main-light">
             <li className="flex items-center">
-              <button>
-                <Link to="/">Home</Link>
-              </button>
-
-              <button>
-                <Link to="/calendar">Calendar</Link>
-              </button>
+              <Link to="/"><button className={url === "/" ? 'text-[18px] underline underline-offset-[6px] text-white' : ''}>Home</button></Link>
+              <Link to="/calendar"><button className={url === "/calendar" ? 'text-[18px] underline underline-offset-[6px] text-white' : ''}>Calendar</button></Link>
+              <Link to="/subjects"><button className={url === "/subjects" ? 'text-[18px] underline underline-offset-[6px] text-white' : ''}>Subjects</button></Link>
             </li>
-
-            <button>
-                <Link to="/subjects">Subjects</Link>
-            </button>
-
             <DropdownBtn
               buttonName="Profile"
               dropDownButtons={dropDownButtons}
