@@ -58,3 +58,12 @@ input:focus,
 textarea:focus {
   @apply outline-none shadow-md shadow-minor-light;
 }
+
+table > tbody > tr > td,  table > thead > tr > td{
+  border: 1px solid white;
+  padding: 10px;
+}
+
+table > tbody > :nth-child(odd) {
+  background-color: darkslategrey;
+}
