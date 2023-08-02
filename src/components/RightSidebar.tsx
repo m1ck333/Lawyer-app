@@ -1,5 +1,6 @@
 import { ArrowRightCircleIcon } from "@heroicons/react/20/solid";
 
+import { useAppSelector } from "../redux/hooks";
 import useCalendar from "../hooks/useCalendar";
 import { Event } from "../types";
 import { EVENT_TYPE_COLORS } from "../constants";
@@ -15,7 +16,6 @@ type Props = {
 
 const RightSidebar = ({ isOpen, onClose }: Props) => {
   const {
-    events,
     isLoadingEvents,
     formInputs,
     handleDeleteEvent,
@@ -29,6 +29,8 @@ const RightSidebar = ({ isOpen, onClose }: Props) => {
     isViewEventModalOpen,
   } = useCalendar();
 
+  const events = useAppSelector((state) => state.events.events);
+  
   const formAdditionalFields = () => {
     return (
       <div className="flex flex-col">

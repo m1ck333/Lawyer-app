@@ -51,7 +51,7 @@ export const getNextSevenDaysWithEvents = (events: Event[]) => {
     date.setDate(today.getDate() + i);
 
     const eventsOnDate = events.filter((event) => {
-      const eventDate = new Date(event.date);
+      const eventDate = transformDateTimeToObject(event.dateTime).date;
       return eventDate.toDateString() === date.toDateString();
     });
 
@@ -62,4 +62,15 @@ export const getNextSevenDaysWithEvents = (events: Event[]) => {
   }
 
   return nextSevenDaysWithEvents;
+};
+
+export const transformDateTimeToObject = (dateTime: string) => {
+  const obj = { date: new Date(), dotDate: "", dashDate: "", time: "" };
+
+  obj.date = new Date(dateTime.split("./")[0].split(".").reverse().join("-"));
+  obj.dotDate = dateTime.split("/")[0];
+  obj.dashDate = dateTime.split("./")[0].split(".").reverse().join("-");
+  obj.time = dateTime.split("/")[1];
+
+  return obj;
 };

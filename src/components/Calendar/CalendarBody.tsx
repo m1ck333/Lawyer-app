@@ -54,7 +54,10 @@ const CalendarBody = ({
           const isToday = date.toDateString() === new Date().toDateString();
 
           const eventsForDate = filteredEvents.filter((event) => {
-            const eventDate = new Date(event.date);
+            const eventDate = new Date(
+              event.dateTime.split("./")[0].split(".").reverse().join("-")
+            );
+
             return (
               eventDate.getDate() === date.getDate() &&
               eventDate.getMonth() === date.getMonth() &&

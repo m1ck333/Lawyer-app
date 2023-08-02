@@ -61,7 +61,6 @@ const Calendar = () => {
         <div className="mx-auto px-4 py-8">
           <CalendarHeader year={year} monthIndex={monthIndex} />
 
-          {/* Pass the filteredEvents instead of events */}
           {isLoadingEvents ? (
             <LoadingSpinner />
           ) : (
@@ -75,6 +74,7 @@ const Calendar = () => {
         </div>
       </div>
 
+      {/* Update event modal */}
       <DialogModal
         buttonName=""
         title="Event Details"

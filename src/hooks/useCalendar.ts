@@ -4,116 +4,25 @@ import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setEvents } from "../redux/slices/eventSlice";
 import { Event, EventTypes, FormInput } from "../types";
-
-const DUMMY_EVENTS: Event[] = [
-  {
-    id: 1,
-    title: "Dummy Event 1",
-    date: "2023-07-15",
-    time: "08:20",
-    description: "This is a dummy event",
-    type: EventTypes.Other,
-  },
-  {
-    id: 2,
-    title: "Dummy Event 2",
-    date: "2023-07-16",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Hearing,
-  },
-  {
-    id: 3,
-    title: "Dummy Event 3",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Meeting,
-  },
-  {
-    id: 4,
-    title: "Dummy Event 4",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Hearing,
-  },
-  {
-    id: 5,
-    title: "Dummy Event 5",
-    date: "2023-07-30",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Report,
-  },
-  {
-    id: 6,
-    title: "Dummy Event 6",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Hearing,
-  },
-  {
-    id: 7,
-    title: "Dummy Event 7",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Hearing,
-  },
-  {
-    id: 8,
-    title: "Dummy Event 8",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Hearing,
-  },
-  {
-    id: 9,
-    title: "Dummy Event 9",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Meeting,
-  },
-  {
-    id: 10,
-    title: "Dummy Event 10",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Meeting,
-  },
-  {
-    id: 11,
-    title: "Dummy Event 11",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Meeting,
-  },
-  {
-    id: 12,
-    title: "Dummy Event 12",
-    date: "2023-07-24",
-    time: "03:20",
-    description: "This is another dummy event",
-    type: EventTypes.Meeting,
-  },
-];
+import { transformDateTimeToObject } from "../utils";
+import {
+  createEvent,
+  deleteEvent,
+  fetchEvents,
+  updateEvent,
+} from "../api/eventApi";
 
 const useCalendar = () => {
   const [isCreateEventModalOpen, setIsCreateEventModalOpen] = useState(false);
   const [isViewEventModalOpen, setIsViewEventModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [time, setTime] = useState("00:00");
   const [eventType, setEventType] = useState<EventTypes[number]>(
     EventTypes.Other
   );
@@ -126,26 +35,23 @@ const useCalendar = () => {
 
   useEffect(() => {
     setIsLoadingEvents(true);
-
-    const fetchEventsFromAPI = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      dispatch(setEvents(DUMMY_EVENTS));
-      setIsLoadingEvents(false);
-    };
-
     fetchEventsFromAPI();
   }, []);
 
-  const handleCreateEvent = async (
-    e: React.FormEvent,
-    type: "create" | "update"
-  ) => {
-    e.preventDefault();
+  const fetchEventsFromAPI = async () => {
+    try {
+      const events = await fetchEvents();
+      dispatch(setEvents(events));
+    } catch (error) {
+      toast("Unsuccessfully fetched events.", {
+        type: "error",
+      });
+    } finally {
+      setIsLoadingEvents(false);
+    }
+  };
 
-    setIsLoading(true);
-
-    setErrors({});
-
+  const validateInputs = () => {
     const errors: { [key: string]: string } = {};
 
     if (!title) {
@@ -164,44 +70,94 @@ const useCalendar = () => {
       errors["time"] = "Enter a time";
     }
 
-    if (Object.keys(errors).length > 0) {
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleCreateEvent = async (
+    e: React.FormEvent,
+    type: "create" | "update"
+  ) => {
+    e.preventDefault();
+
+    if (!selectedEvent && type === "update") {
+      throw new Error("No event selected for creating/updating.");
+    }
+
+    setIsLoading(true);
+
+    if (!validateInputs()) {
       setIsLoading(false);
-      setErrors(errors);
       return;
     }
 
-    if (type === "create") {
-      // Simulating event creation with a delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      if (type === "create") {
+        await createEvent({
+          title,
+          description,
+          dateTime: `${date}T${time}`,
+          type: eventType as EventTypes,
+        });
+      } else if (type === "update" && selectedEvent) {
+        await updateEvent({
+          id: selectedEvent.id,
+          title,
+          description,
+          dateTime: `${date}T${time}`,
+          type: eventType as EventTypes,
+        });
+      } else {
+        throw new Error("Invalid operation or eventId missing for update.");
+      }
 
-      toast("Successfully created event.", {
-        type: "success",
-      });
+      if (type === "create") {
+        setIsCreateEventModalOpen(false);
+
+        toast("Successfully created event.", {
+          type: "success",
+        });
+      } else if (type === "update") {
+        setIsViewEventModalOpen(false);
+
+        toast("Successfully updated event.", {
+          type: "success",
+        });
+      }
 
       clearInputs();
-    } else if (type === "update") {
-      // Simulating event creation with a delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast("Successfully updated event.", {
-        type: "success",
+    } catch (error) {
+      toast("Failed to create/update event.", {
+        type: "error",
       });
+    } finally {
+      setIsLoading(false);
+      fetchEventsFromAPI();
     }
-
-    console.log({ title, description, date, time });
-
-    setIsLoading(false);
   };
 
-  const handleDeleteEvent = () => {
+  const handleDeleteEvent = async () => {
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      if (!selectedEvent) {
+        throw new Error("No event selected for deletion.");
+      }
+
+      await deleteEvent(selectedEvent.id);
+
       toast("Event deleted successfully!", { type: "success" });
+
       clearInputs();
       setIsViewEventModalOpen(false);
+    } catch (error) {
+      toast("Failed to delete event.", {
+        type: "error",
+      });
+    } finally {
       setIsLoading(false);
-    }, 2000);
+      fetchEventsFromAPI();
+    }
   };
 
   const formInputs: FormInput[] = [
@@ -252,23 +208,25 @@ const useCalendar = () => {
   const clearInputs = () => {
     setTitle("");
     setDescription("");
-    setDate("");
-    setTime("");
+    setDate(new Date().toISOString().split('T')[0]);
+    setTime("00:00");
   };
 
   const handleEventClick = (event: Event, e: React.MouseEvent) => {
     e.stopPropagation();
 
+    setSelectedEvent(event);
     setEventType(event.type);
     setTitle(event.title);
     setDescription(event.description);
-    setDate(event.date);
-    setTime(event.time);
+    setDate(transformDateTimeToObject(event.dateTime).dashDate);
+    setTime(transformDateTimeToObject(event.dateTime).time);
 
     setIsViewEventModalOpen(true);
   };
 
   const handleEventModalClose = () => {
+    setSelectedEvent(null);
     setErrors({});
     setEventType(EventTypes.Other);
     setIsCreateEventModalOpen(false);
@@ -293,7 +251,6 @@ const useCalendar = () => {
     monthIndex,
     year,
     eventTypesArray,
-    events: DUMMY_EVENTS,
   };
 };
 
