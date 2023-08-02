@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Subject from "./Subject";
 
-interface Subject {
+interface SubjectList {
   subjectNumber: string;
-  dateOfReceipt: string;
+  dateOfReceipt: any;
   subject: string;
   associates: string,
   client: string,
@@ -11,20 +11,22 @@ interface Subject {
 }
 
 interface SubjectListProps {
-  subjects: Subject[];
+  subjects: SubjectList[];
 }
 
-const SubjectsList: React.FC<SubjectListProps> = ({ subjects }) => {   
+const SubjectsList: React.FC<SubjectListProps> = ({subjects}) => {  
   
   const [isClickedSubject, setIsClickedSubject] = useState(false);
   const [subjectNumberstate, setSubjectNumberState] = useState('');
   const [subjectState, setSubjectState] = useState('');
-  const [dateOfReceiptState, setDateOfReceiptState] = useState('');
+  const [dateOfReceiptState, setDateOfReceiptState] = useState({});
   const [associatesState, setAssociatesState] = useState('');
   const [clientState, setClientState] = useState('');
   const [opponentState, setOpponentState] = useState('');
 
-  const test = (subject: Subject) => {      
+  const [isClicked, setIsClicked] = useState(false);  
+
+  const openSubject = (subject: SubjectList) => {      
       setSubjectNumberState(subject.subjectNumber);
       setDateOfReceiptState(subject.dateOfReceipt);
       setSubjectState(subject.subject);
@@ -36,6 +38,31 @@ const SubjectsList: React.FC<SubjectListProps> = ({ subjects }) => {
 
   const closeModal = () => {
     setIsClickedSubject(false);
+  }  
+
+  function compareFunction (a: any, b: any) { 
+    const propA = a['subject'].toLowerCase();
+    const propB = b['subject'].toLowerCase();   
+    
+    if (propA < propB) {
+        return -1;
+    }
+    if (propA > propB) {
+        return 1;
+    }
+
+    return 0;
+    
+}  
+
+  function sortAlphabeticalSubjects() {
+    setIsClicked(!isClicked);
+    return subjects.sort(compareFunction);
+  }
+
+  function sortSubjectsByDate() {
+    setIsClicked(!isClicked);    
+    subjects.sort((a: any, b: any) => a.dateOfReceipt - b.dateOfReceipt);
   }
 
   return (
@@ -50,21 +77,27 @@ const SubjectsList: React.FC<SubjectListProps> = ({ subjects }) => {
       {!isClickedSubject && 
       <table>
       <thead key="">
-          <tr>
-          <td>Predmet</td>
+          <tr>          
+          <td className="cursor-pointer hover:underline" onClick={sortAlphabeticalSubjects}>Predmet</td>          
           <td>Broj predmeta</td>
-          <td>Datum prijema</td>          
+          <td className="cursor-pointer hover:underline" onClick={sortSubjectsByDate}>Datum prijema</td>          
           <td>Saradnici</td>
           <td>Klijent</td>
           <td>Protivnik</td>          
           </tr>
       </thead>
       <tbody >
-          {subjects.map((subject, index) => (        
+          {subjects.map((subject, index) => (
                 <tr key={index}> 
-                  <td className="cursor-pointer hover:text-blue-300 underline " onClick={() => test(subject)}>{`${subject.subject}`}</td>
+                  <td className="cursor-pointer hover:text-blue-300 underline " onClick={() => openSubject(subject)}>{`${subject.subject}`}</td>
                   <td>{`${subject.subjectNumber}`}</td>
-                  <td>{`${subject.dateOfReceipt}`}</td>            
+                  <td>
+                    {`
+                      ${subject.dateOfReceipt.getDate()}.
+                      ${subject.dateOfReceipt.getMonth() + 1}.
+                      ${subject.dateOfReceipt.getFullYear()}.
+                   `}
+                  </td>            
                   <td>{`${subject.associates}`}</td>
                   <td>{`${subject.client}`}</td>
                   <td>{`${subject.opponent}`}</td>
