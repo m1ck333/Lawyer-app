@@ -31,7 +31,7 @@ const Subjects = () => {
         }
     ]; 
 
-    // dummySubjects.sort((a: any, b: any) => a.dateOfReceipt - b.dateOfReceipt);    
+    dummySubjects.sort((a: any, b: any) => a.dateOfReceipt - b.dateOfReceipt); 
     
     return (
     

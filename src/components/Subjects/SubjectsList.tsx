@@ -14,7 +14,7 @@ interface SubjectListProps {
   subjects: SubjectList[];
 }
 
-const SubjectsList: React.FC<SubjectListProps> = ({subjects}) => {  
+const SubjectsList: React.FC<SubjectListProps> = ({subjects}) => {    
   
   const [isClickedSubject, setIsClickedSubject] = useState(false);
   const [subjectNumberstate, setSubjectNumberState] = useState('');
@@ -24,7 +24,7 @@ const SubjectsList: React.FC<SubjectListProps> = ({subjects}) => {
   const [clientState, setClientState] = useState('');
   const [opponentState, setOpponentState] = useState('');
 
-  const [isClicked, setIsClicked] = useState(false);  
+  const [subjectsArray, setSubjectsArray] = useState(subjects)
 
   const openSubject = (subject: SubjectList) => {      
       setSubjectNumberState(subject.subjectNumber);
@@ -56,18 +56,18 @@ const SubjectsList: React.FC<SubjectListProps> = ({subjects}) => {
 }  
 
   function sortAlphabeticalSubjects() {
-    setIsClicked(!isClicked);
-    return subjects.sort(compareFunction);
+    const sortedSubjects = [...subjects].sort(compareFunction);
+    setSubjectsArray(sortedSubjects);
   }
 
   function sortSubjectsByDate() {
-    setIsClicked(!isClicked);    
-    subjects.sort((a: any, b: any) => a.dateOfReceipt - b.dateOfReceipt);
+    const sortedSubjects = [...subjects].sort((a: any, b: any) => a.dateOfReceipt - b.dateOfReceipt);
+    setSubjectsArray(sortedSubjects);
   }
 
   return (
     
-    <div className="border p-[20px]">
+    <div className="border p-[20px] ">
       {!isClickedSubject 
         ?
         <h1 className="flex justify-center mb-[30px] text-[25px]">Lista predmeta: </h1>
@@ -78,16 +78,16 @@ const SubjectsList: React.FC<SubjectListProps> = ({subjects}) => {
       <table>
       <thead key="">
           <tr>          
-          <td className="cursor-pointer hover:underline" onClick={sortAlphabeticalSubjects}>Predmet</td>          
+          <td className="cursor-pointer hover:text-blue-300 underline" onClick={sortAlphabeticalSubjects}>Predmet</td>          
           <td>Broj predmeta</td>
-          <td className="cursor-pointer hover:underline" onClick={sortSubjectsByDate}>Datum prijema</td>          
+          <td className="cursor-pointer hover:text-blue-300 underline" onClick={sortSubjectsByDate}>Datum prijema</td>          
           <td>Saradnici</td>
           <td>Klijent</td>
           <td>Protivnik</td>          
           </tr>
       </thead>
       <tbody >
-          {subjects.map((subject, index) => (
+          {subjectsArray.map((subject, index) => (
                 <tr key={index}> 
                   <td className="cursor-pointer hover:text-blue-300 underline " onClick={() => openSubject(subject)}>{`${subject.subject}`}</td>
                   <td>{`${subject.subjectNumber}`}</td>
